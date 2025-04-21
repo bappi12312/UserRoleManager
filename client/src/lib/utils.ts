@@ -25,7 +25,7 @@ export function getInitials(name: string): string {
 
 export function formatDate(date: Date | string | null | undefined): string {
   if (!date) return 'N/A';
-  const d = typeof date === 'string' ? new Date(date) : date;
+  const d = typeof date === 'string' ? new Date(date) : date as Date;
   return d.toLocaleDateString('en-US', {
     year: 'numeric',
     month: 'long',

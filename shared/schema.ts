@@ -1,6 +1,7 @@
-import { pgTable, text, serial, integer, boolean, timestamp, doublePrecision } from "drizzle-orm/pg-core";
+import { pgTable, text, serial, integer, boolean, timestamp, doublePrecision, primaryKey } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
+import { relations } from "drizzle-orm";
 
 // User role types
 export enum UserRole {
@@ -115,3 +116,49 @@ export type Transaction = typeof transactions.$inferSelect;
 export type InsertTransaction = z.infer<typeof insertTransactionSchema>;
 export type LoginData = z.infer<typeof loginSchema>;
 export type ActivateUserData = z.infer<typeof activateUserSchema>;
+
+// Define table relationships
+export const usersRelations = relations(users, ({ one, many }) => ({
+  referrer: one(users, {
+    fields: [users.referredBy],
+    references: [users.id],
+    relationName: "userReferrals"
+  }),
+  referrals: many(users, { relationName: "userReferrals" }),
+  orders: many(orders),
+  transactions: many(transactions, { relationName: "userTransactions" }),
+  relatedTransactions: many(transactions, { relationName: "relatedUserTransactions" })
+}));
+
+export const productsRelations = relations(products, ({ many }) => ({
+  orders: many(orders)
+}));
+
+export const ordersRelations = relations(orders, ({ one, many }) => ({
+  user: one(users, {
+    fields: [orders.userId],
+    references: [users.id]
+  }),
+  product: one(products, {
+    fields: [orders.productId],
+    references: [products.id]
+  }),
+  transactions: many(transactions)
+}));
+
+export const transactionsRelations = relations(transactions, ({ one }) => ({
+  user: one(users, {
+    fields: [transactions.userId],
+    references: [users.id],
+    relationName: "userTransactions"
+  }),
+  relatedUser: one(users, {
+    fields: [transactions.relatedUserId],
+    references: [users.id],
+    relationName: "relatedUserTransactions"
+  }),
+  order: one(orders, {
+    fields: [transactions.relatedOrderId],
+    references: [orders.id]
+  })
+}));
