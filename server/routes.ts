@@ -1,6 +1,6 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
-import { setupAuth } from "./auth";
+import { setupAuth, hashPassword, comparePasswords } from "./auth";
 import { storage } from "./storage";
 import { UserRole, insertProductSchema, insertOrderSchema } from "@shared/schema";
 
@@ -185,6 +185,92 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const userId = req.user!.id;
       const transactions = await storage.getUserTransactions(userId);
       res.json(transactions);
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // User profile update endpoints
+  app.patch("/api/user/profile", isAuthenticated, async (req, res) => {
+    try {
+      const userId = req.user!.id;
+      const { fullName, email } = req.body;
+      
+      // Validate email is not taken by another user
+      if (email && email !== req.user!.email) {
+        const existingUser = await storage.getUserByEmail(email);
+        if (existingUser && existingUser.id !== userId) {
+          return res.status(400).json({ error: "Email already in use" });
+        }
+      }
+      
+      const updatedUser = await storage.updateUser(userId, { fullName, email });
+      if (!updatedUser) {
+        return res.status(404).json({ error: "User not found" });
+      }
+      
+      res.json(updatedUser);
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // Password update endpoint
+  app.patch("/api/user/password", isAuthenticated, async (req, res) => {
+    try {
+      const userId = req.user!.id;
+      const { currentPassword, newPassword } = req.body;
+      
+      // Get current user to check password
+      const user = await storage.getUser(userId);
+      if (!user) {
+        return res.status(404).json({ error: "User not found" });
+      }
+      
+      // We already imported the password functions at the top
+      
+      // Verify current password
+      const isPasswordValid = await comparePasswords(currentPassword, user.password);
+      if (!isPasswordValid) {
+        return res.status(400).json({ error: "Current password is incorrect" });
+      }
+      
+      // Update password
+      const hashedPassword = await hashPassword(newPassword);
+      const updatedUser = await storage.updateUser(userId, { password: hashedPassword });
+      
+      res.json({ success: true });
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // Notification preferences endpoint
+  app.patch("/api/user/notifications", isAuthenticated, async (req, res) => {
+    try {
+      const userId = req.user!.id;
+      // In a real app, you would store these preferences in a separate table
+      // For now, just return success
+      res.json({ success: true });
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // Support endpoint
+  app.post("/api/support", isAuthenticated, async (req, res) => {
+    try {
+      const { subject, message } = req.body;
+      
+      // Validate input
+      if (!subject || !message) {
+        return res.status(400).json({ error: "Subject and message are required" });
+      }
+      
+      // In a real app, you would store this in a database and/or send an email
+      console.log(`Support request from ${req.user!.username}: ${subject}`);
+      
+      res.json({ success: true });
     } catch (error: any) {
       res.status(500).json({ error: error.message });
     }
