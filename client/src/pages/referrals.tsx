@@ -1,6 +1,6 @@
 import { useAuth } from "@/hooks/use-auth";
 import { useQuery } from "@tanstack/react-query";
-import { User } from "@shared/schema";
+import { User, Transaction } from "@shared/schema";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import AppLayout from "@/components/layout/app-layout";
@@ -40,7 +40,7 @@ export default function Referrals() {
   });
 
   // Fetch transactions to calculate earnings
-  const { data: transactions = [] } = useQuery({
+  const { data: transactions = [] } = useQuery<Transaction[]>({
     queryKey: ['/api/transactions'],
     enabled: !!user,
   });
@@ -59,18 +59,20 @@ export default function Referrals() {
   
   // Get earnings per referral (in a real implementation, this would come from the backend)
   const getReferralEarnings = (referralId: number) => {
-    return transactions
-      .filter(t => 
+    const transactionList = Array.isArray(transactions) ? transactions : [];
+    return transactionList
+      .filter((t: Transaction) => 
         t.relatedUserId === referralId && 
         ["REFERRAL_COMMISSION", "PRODUCT_COMMISSION"].includes(t.type)
       )
-      .reduce((sum, t) => sum + t.amount, 0);
+      .reduce((sum: number, t: Transaction) => sum + t.amount, 0);
   };
   
   // Calculate total earnings from referrals
-  const totalReferralEarnings = transactions
-    .filter(t => ["REFERRAL_COMMISSION", "PRODUCT_COMMISSION"].includes(t.type))
-    .reduce((sum, t) => sum + t.amount, 0);
+  const transactionList = Array.isArray(transactions) ? transactions : [];
+  const totalReferralEarnings = transactionList
+    .filter((t: Transaction) => ["REFERRAL_COMMISSION", "PRODUCT_COMMISSION"].includes(t.type))
+    .reduce((sum: number, t: Transaction) => sum + t.amount, 0);
   
   const totalDirectReferrals = referrals.length;
   const totalActiveReferrals = referrals.filter(r => r.role !== "USER").length;
