@@ -1,0 +1,31 @@
+1. **User Roles**: Our platform is designed with four distinct user roles to maximize engagement and earning potential:
+   - **User**
+   - **Active User** (unlock this role with a $100 activation fee)
+   - **Affiliator User** (activate this role for $250)
+   - **Admin**
+
+   Every user will receive a unique referral code to enhance their earning possibilities.
+
+2. **Earning Potential**: Users have various lucrative options for earning money:
+   - **Active Users** can earn through referrals. When someone registers using their referral code and activates their account, the Active User's upline will benefit from the following earnings:
+     - Upline One: 20%
+     - Upline Two: 10%
+     - Upline Three: 5%
+
+   - If a user becomes an Affiliator by following a referral link and paying the $250 fee, the same commission structure applies to their upline.
+
+3. **Affiliator Earnings**: As an Affiliator User, you can significantly boost your income by selling products from our website, earning a commission based on the product’s sale price.
+
+The platform empowers users to both showcase and purchase products seamlessly. To buy, users must complete a payment, and while entering a valid referral code is optional, it can enhance their rewards. Any user has the opportunity to become both an Active User and an Affiliator.
+
+Active Users can browse all products, make purchases, and earn money through their referral code while enjoying the additional benefits of being an Affiliator.
+
+Affiliators have the freedom to sell any products listed on our website.
+
+Admins maintain full control over user roles, performing essential functions such as managing product listings—adding, updating, and deleting as necessary.
+
+All features will operate in real-time with the help of Socket.IO, ensuring an interactive experience.
+
+This strategic approach is crafted to drive user engagement and empower multiple income streams across our platform. Furthermore, the application will integrate with Bkash for efficient money withdrawals and transfers, use Redis for optimized caching, and employ Socket.IO for seamless real-time communication.
+
+Our commitment is to create a website that is scalable, SEO-friendly, and highly optimized for performance, ensuring the best experience for our users.
