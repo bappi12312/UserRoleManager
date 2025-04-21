@@ -10,13 +10,15 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Loader2, Star, StarHalf, ShoppingCart, Share2 } from "lucide-react";
+import { Loader2, Star, StarHalf, ShoppingCart, Share2, CreditCard } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
+import { useLocation } from "wouter";
 
 export default function ProductDetails({ id }: { id: number }) {
   const { user } = useAuth();
   const { toast } = useToast();
   const [referralCode, setReferralCode] = useState("");
+  const [_, navigate] = useLocation();
   
   const { data: product, isLoading } = useQuery<Product>({
     queryKey: [`/api/products/${id}`],
@@ -167,6 +169,7 @@ export default function ProductDetails({ id }: { id: number }) {
               <Button 
                 className="flex-1"
                 size="lg"
+                variant="secondary"
                 onClick={handlePurchase}
                 disabled={purchaseMutation.isPending}
               >
@@ -175,7 +178,26 @@ export default function ProductDetails({ id }: { id: number }) {
                 ) : (
                   <ShoppingCart className="mr-2 h-5 w-5" />
                 )}
-                Buy Now
+                Quick Purchase
+              </Button>
+              
+              <Button 
+                className="flex-1"
+                size="lg"
+                onClick={() => {
+                  if (!user) {
+                    toast({
+                      title: "Authentication Required",
+                      description: "Please log in to purchase this product",
+                      variant: "destructive",
+                    });
+                    return;
+                  }
+                  navigate(`/checkout?productId=${id}&referralCode=${referralCode}`);
+                }}
+              >
+                <CreditCard className="mr-2 h-5 w-5" />
+                Card Payment
               </Button>
               
               <Button variant="outline" size="lg">

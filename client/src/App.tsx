@@ -12,6 +12,10 @@ import Referrals from "@/pages/referrals";
 import Earnings from "@/pages/earnings";
 import Orders from "@/pages/orders";
 import Withdrawals from "@/pages/withdrawals";
+import Checkout from "@/pages/checkout";
+import ActivateRole from "@/pages/activate-role";
+import Settings from "@/pages/settings";
+import Support from "@/pages/support";
 import AdminDashboard from "@/pages/admin/dashboard";
 import AdminUsers from "@/pages/admin/users";
 import AdminProducts from "@/pages/admin/products";
@@ -47,6 +51,18 @@ function Router() {
       </Route>
       <Route path="/withdrawals">
         <ProtectedRoute component={Withdrawals} />
+      </Route>
+      <Route path="/settings">
+        <ProtectedRoute component={Settings} />
+      </Route>
+      <Route path="/support">
+        <ProtectedRoute component={Support} />
+      </Route>
+      <Route path="/checkout">
+        <ProtectedRoute component={Checkout} />
+      </Route>
+      <Route path="/activate-role">
+        <ProtectedRoute component={ActivateRole} />
       </Route>
       
       {/* Admin Routes */}
