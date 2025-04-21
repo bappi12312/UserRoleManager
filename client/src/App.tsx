@@ -8,6 +8,10 @@ import AuthPage from "@/pages/auth-page";
 import Dashboard from "@/pages/dashboard";
 import Products from "@/pages/products";
 import ProductDetails from "@/pages/product-details";
+import Referrals from "@/pages/referrals";
+import Earnings from "@/pages/earnings";
+import Orders from "@/pages/orders";
+import Withdrawals from "@/pages/withdrawals";
 import AdminDashboard from "@/pages/admin/dashboard";
 import AdminUsers from "@/pages/admin/users";
 import AdminProducts from "@/pages/admin/products";
@@ -31,6 +35,18 @@ function Router() {
         {(params) => (
           <ProtectedRoute component={() => <ProductDetails id={parseInt(params.id)} />} />
         )}
+      </Route>
+      <Route path="/referrals">
+        <ProtectedRoute component={Referrals} />
+      </Route>
+      <Route path="/earnings">
+        <ProtectedRoute component={Earnings} />
+      </Route>
+      <Route path="/orders">
+        <ProtectedRoute component={Orders} />
+      </Route>
+      <Route path="/withdrawals">
+        <ProtectedRoute component={Withdrawals} />
       </Route>
       
       {/* Admin Routes */}
