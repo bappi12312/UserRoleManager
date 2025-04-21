@@ -202,6 +202,9 @@ export class DatabaseStorage implements IStorage {
   
   // Helper methods
   private async processRoleActivationCommissions(user: User, amount: number, role: UserRole): Promise<void> {
+    // Dynamically import socket notification functions to avoid circular dependency
+    const { notifyTransactionUpdate, notifyUser } = await import('./socket');
+    
     // Get the referral chain (up to 3 levels)
     const referrerIds: number[] = [];
     let currentUserId = user.referredBy;
@@ -225,12 +228,21 @@ export class DatabaseStorage implements IStorage {
       const commissionAmount = amount * commissionRate;
       
       // Create commission transaction
-      await this.createTransaction({
+      const transaction = await this.createTransaction({
         userId: referrerId,
         type: "REFERRAL_COMMISSION",
         amount: commissionAmount,
         description: `Level ${i+1} commission for ${role} activation by ${user.username}`,
         relatedUserId: user.id
+      });
+      
+      // Send real-time notifications
+      notifyTransactionUpdate(referrerId, transaction, `You received a new commission!`);
+      notifyUser(referrerId, {
+        type: 'success',
+        title: 'Commission Received',
+        message: `You received $${commissionAmount.toFixed(2)} commission from ${user.username} upgrading to ${role}!`,
+        timestamp: new Date()
       });
     }
   }

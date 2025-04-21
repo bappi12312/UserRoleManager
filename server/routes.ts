@@ -4,6 +4,7 @@ import { setupAuth, hashPassword, comparePasswords } from "./auth";
 import { storage } from "./storage";
 import { UserRole, insertProductSchema, insertOrderSchema } from "@shared/schema";
 import Stripe from "stripe";
+import { setupSocketIO, notifyOrderUpdate, notifyTransactionUpdate, notifyUserUpdate, notifyUser } from "./socket";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Set up authentication routes and middlewares
@@ -162,6 +163,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const order = await storage.createOrder({
         ...orderData,
         amount: product.price
+      });
+      
+      // Send real-time notification to the user
+      notifyOrderUpdate(req.user!.id, order, `Order #${order.id} has been created successfully!`);
+      notifyUser(req.user!.id, {
+        type: 'success',
+        title: 'Order Placed',
+        message: `You successfully purchased ${product.name}!`,
+        timestamp: new Date()
       });
       
       res.status(201).json(order);
@@ -388,6 +398,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
             });
             
             console.log(`Created order: ${order.id} for user ${userId}`);
+            
+            // Send real-time notification
+            notifyOrderUpdate(userId, order, `Order #${order.id} has been completed successfully!`);
+            notifyUser(userId, {
+              type: 'success',
+              title: 'Payment Processed',
+              message: `Your payment for ${product.name} has been processed successfully!`,
+              timestamp: new Date()
+            });
           }
         } else if (metadata.role) {
           // Role activation
@@ -397,6 +416,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
           
           // Activate user role
           const user = await storage.activateUserRole(userId, role, referralCode);
+          
+          // Send real-time notification
+          notifyUserUpdate(userId, user, `Your account has been upgraded to ${role}!`);
+          notifyUser(userId, {
+            type: 'success',
+            title: 'Role Upgraded',
+            message: `Congratulations! Your account has been upgraded to ${role} successfully.`,
+            timestamp: new Date()
+          });
           
           console.log(`Activated role ${role} for user ${userId}`);
         }
