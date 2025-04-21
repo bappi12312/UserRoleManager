@@ -131,111 +131,99 @@ export default function Sidebar({ sidebarOpen, setSidebarOpen, user }: SidebarPr
           <div className="px-3 mb-3">
             <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider">General</h3>
           </div>
-          <Link href="/">
-            <a className={`flex items-center px-3 py-2 mx-2 rounded-md ${
-              isActive('/') ? 'bg-primary-50 text-primary-700' : 'text-gray-700 hover:bg-gray-100'
-            }`}>
-              <i className="ri-dashboard-line mr-3 text-lg"></i>
-              <span>Dashboard</span>
-            </a>
-          </Link>
-          <Link href="/products">
-            <a className={`flex items-center px-3 py-2 mx-2 mt-1 rounded-md ${
-              isActive('/products') ? 'bg-primary-50 text-primary-700' : 'text-gray-700 hover:bg-gray-100'
-            }`}>
-              <i className="ri-shopping-bag-line mr-3 text-lg"></i>
-              <span>Products</span>
-            </a>
-          </Link>
-          <Link href="/orders">
-            <a className={`flex items-center px-3 py-2 mx-2 mt-1 rounded-md ${
-              isActive('/orders') ? 'bg-primary-50 text-primary-700' : 'text-gray-700 hover:bg-gray-100'
-            }`}>
-              <i className="ri-shopping-cart-line mr-3 text-lg"></i>
-              <span>My Orders</span>
-            </a>
-          </Link>
+          <div className={`flex items-center px-3 py-2 mx-2 rounded-md cursor-pointer ${
+            isActive('/') ? 'bg-primary-50 text-primary-700' : 'text-gray-700 hover:bg-gray-100'
+          }`} onClick={() => window.location.href = '/'}>
+            <i className="ri-dashboard-line mr-3 text-lg"></i>
+            <span>Dashboard</span>
+          </div>
+          <div className={`flex items-center px-3 py-2 mx-2 mt-1 rounded-md cursor-pointer ${
+            isActive('/products') ? 'bg-primary-50 text-primary-700' : 'text-gray-700 hover:bg-gray-100'
+          }`} onClick={() => window.location.href = '/products'}>
+            <i className="ri-shopping-bag-line mr-3 text-lg"></i>
+            <span>Products</span>
+          </div>
+          <div className={`flex items-center px-3 py-2 mx-2 mt-1 rounded-md cursor-pointer ${
+            isActive('/orders') ? 'bg-primary-50 text-primary-700' : 'text-gray-700 hover:bg-gray-100'
+          }`} onClick={() => window.location.href = '/orders'}>
+            <i className="ri-shopping-cart-line mr-3 text-lg"></i>
+            <span>My Orders</span>
+          </div>
           
           <div className="px-3 my-3">
             <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Referral Program</h3>
           </div>
-          <Link href="/referrals">
-            <a className={`flex items-center px-3 py-2 mx-2 rounded-md ${
-              isActive('/referrals') ? 'bg-primary-50 text-primary-700' : 'text-gray-700 hover:bg-gray-100'
-            }`}>
-              <i className="ri-team-line mr-3 text-lg"></i>
-              <span>My Network</span>
-            </a>
-          </Link>
-          <Link href="/earnings">
-            <a className={`flex items-center px-3 py-2 mx-2 mt-1 rounded-md ${
-              isActive('/earnings') ? 'bg-primary-50 text-primary-700' : 'text-gray-700 hover:bg-gray-100'
-            }`}>
-              <i className="ri-money-dollar-circle-line mr-3 text-lg"></i>
-              <span>Earnings</span>
-            </a>
-          </Link>
-          <Link href="/withdrawals">
-            <a className={`flex items-center px-3 py-2 mx-2 mt-1 rounded-md ${
-              isActive('/withdrawals') ? 'bg-primary-50 text-primary-700' : 'text-gray-700 hover:bg-gray-100'
-            }`}>
-              <i className="ri-bank-card-line mr-3 text-lg"></i>
-              <span>Withdrawals</span>
-            </a>
-          </Link>
+          <div className={`px-3 py-2 mx-2 rounded-md cursor-pointer ${
+            isActive('/referrals') ? 'bg-primary-50 text-primary-700' : 'text-gray-700 hover:bg-gray-100'
+          }`} onClick={() => window.location.href = '/referrals'}>
+            <i className="ri-team-line mr-3 text-lg"></i>
+            <span>My Network</span>
+          </div>
+          <div className={`px-3 py-2 mx-2 mt-1 rounded-md cursor-pointer ${
+            isActive('/earnings') ? 'bg-primary-50 text-primary-700' : 'text-gray-700 hover:bg-gray-100'
+          }`} onClick={() => window.location.href = '/earnings'}>
+            <i className="ri-money-dollar-circle-line mr-3 text-lg"></i>
+            <span>Earnings</span>
+          </div>
+          <div className={`px-3 py-2 mx-2 mt-1 rounded-md cursor-pointer ${
+            isActive('/withdrawals') ? 'bg-primary-50 text-primary-700' : 'text-gray-700 hover:bg-gray-100'
+          }`} onClick={() => window.location.href = '/withdrawals'}>
+            <i className="ri-bank-card-line mr-3 text-lg"></i>
+            <span>Withdrawals</span>
+          </div>
+          
+          <div className="px-3 my-3">
+            <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Membership</h3>
+          </div>
+          <div className={`px-3 py-2 mx-2 rounded-md cursor-pointer ${
+            isActive('/activate-role') ? 'bg-primary-50 text-primary-700' : 'text-gray-700 hover:bg-gray-100'
+          }`} onClick={() => window.location.href = '/activate-role'}>
+            <i className="ri-vip-crown-line mr-3 text-lg"></i>
+            <span>Upgrade Role</span>
+          </div>
           
           {user.role === UserRole.ADMIN && (
             <>
               <div className="px-3 my-3">
                 <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Administration</h3>
               </div>
-              <Link href="/admin">
-                <a className={`flex items-center px-3 py-2 mx-2 rounded-md ${
-                  isActive('/admin') && !isActive('/admin/users') && !isActive('/admin/products') 
-                    ? 'bg-primary-50 text-primary-700' 
-                    : 'text-gray-700 hover:bg-gray-100'
-                }`}>
-                  <i className="ri-dashboard-line mr-3 text-lg"></i>
-                  <span>Admin Dashboard</span>
-                </a>
-              </Link>
-              <Link href="/admin/users">
-                <a className={`flex items-center px-3 py-2 mx-2 mt-1 rounded-md ${
-                  isActive('/admin/users') ? 'bg-primary-50 text-primary-700' : 'text-gray-700 hover:bg-gray-100'
-                }`}>
-                  <i className="ri-user-settings-line mr-3 text-lg"></i>
-                  <span>Manage Users</span>
-                </a>
-              </Link>
-              <Link href="/admin/products">
-                <a className={`flex items-center px-3 py-2 mx-2 mt-1 rounded-md ${
-                  isActive('/admin/products') ? 'bg-primary-50 text-primary-700' : 'text-gray-700 hover:bg-gray-100'
-                }`}>
-                  <i className="ri-store-line mr-3 text-lg"></i>
-                  <span>Manage Products</span>
-                </a>
-              </Link>
+              <div className={`flex items-center px-3 py-2 mx-2 rounded-md cursor-pointer ${
+                isActive('/admin') && !isActive('/admin/users') && !isActive('/admin/products') 
+                  ? 'bg-primary-50 text-primary-700' 
+                  : 'text-gray-700 hover:bg-gray-100'
+              }`} onClick={() => window.location.href = '/admin'}>
+                <i className="ri-dashboard-line mr-3 text-lg"></i>
+                <span>Admin Dashboard</span>
+              </div>
+              <div className={`flex items-center px-3 py-2 mx-2 mt-1 rounded-md cursor-pointer ${
+                isActive('/admin/users') ? 'bg-primary-50 text-primary-700' : 'text-gray-700 hover:bg-gray-100'
+              }`} onClick={() => window.location.href = '/admin/users'}>
+                <i className="ri-user-settings-line mr-3 text-lg"></i>
+                <span>Manage Users</span>
+              </div>
+              <div className={`flex items-center px-3 py-2 mx-2 mt-1 rounded-md cursor-pointer ${
+                isActive('/admin/products') ? 'bg-primary-50 text-primary-700' : 'text-gray-700 hover:bg-gray-100'
+              }`} onClick={() => window.location.href = '/admin/products'}>
+                <i className="ri-store-line mr-3 text-lg"></i>
+                <span>Manage Products</span>
+              </div>
             </>
           )}
           
           <div className="border-t border-gray-200 my-4"></div>
           
-          <Link href="/support">
-            <a className={`flex items-center px-3 py-2 mx-2 mt-1 rounded-md ${
-              isActive('/support') ? 'bg-primary-50 text-primary-700' : 'text-gray-700 hover:bg-gray-100'
-            }`}>
-              <i className="ri-customer-service-line mr-3 text-lg"></i>
-              <span>Support</span>
-            </a>
-          </Link>
-          <Link href="/settings">
-            <a className={`flex items-center px-3 py-2 mx-2 mt-1 rounded-md ${
-              isActive('/settings') ? 'bg-primary-50 text-primary-700' : 'text-gray-700 hover:bg-gray-100'
-            }`}>
-              <i className="ri-settings-line mr-3 text-lg"></i>
-              <span>Settings</span>
-            </a>
-          </Link>
+          <div className={`flex items-center px-3 py-2 mx-2 mt-1 rounded-md cursor-pointer ${
+            isActive('/support') ? 'bg-primary-50 text-primary-700' : 'text-gray-700 hover:bg-gray-100'
+          }`} onClick={() => window.location.href = '/support'}>
+            <i className="ri-customer-service-line mr-3 text-lg"></i>
+            <span>Support</span>
+          </div>
+          <div className={`flex items-center px-3 py-2 mx-2 mt-1 rounded-md cursor-pointer ${
+            isActive('/settings') ? 'bg-primary-50 text-primary-700' : 'text-gray-700 hover:bg-gray-100'
+          }`} onClick={() => window.location.href = '/settings'}>
+            <i className="ri-settings-line mr-3 text-lg"></i>
+            <span>Settings</span>
+          </div>
         </nav>
         
         {/* Upgrade Account Banner - Only show if user is not already an Affiliator or Admin */}
