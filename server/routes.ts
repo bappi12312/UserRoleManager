@@ -3,6 +3,7 @@ import { createServer, type Server } from "http";
 import { setupAuth, hashPassword, comparePasswords } from "./auth";
 import { storage } from "./storage";
 import { UserRole, insertProductSchema, insertOrderSchema } from "@shared/schema";
+import Stripe from "stripe";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Set up authentication routes and middlewares
@@ -273,6 +274,138 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({ success: true });
     } catch (error: any) {
       res.status(500).json({ error: error.message });
+    }
+  });
+
+  // Stripe payment integration
+  if (!process.env.STRIPE_SECRET_KEY) {
+    throw new Error('Missing required Stripe secret: STRIPE_SECRET_KEY');
+  }
+  const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
+    apiVersion: "2023-10-16",
+  });
+
+  // Create a payment intent for product purchase
+  app.post("/api/create-payment-intent", isAuthenticated, async (req, res) => {
+    try {
+      const { productId } = req.body;
+      
+      // Fetch product details from database
+      const product = await storage.getProduct(productId);
+      if (!product) {
+        return res.status(404).json({ error: "Product not found" });
+      }
+      
+      // Create payment intent
+      const paymentIntent = await stripe.paymentIntents.create({
+        amount: Math.round(product.price * 100), // Convert to cents
+        currency: "usd",
+        metadata: {
+          productId: productId.toString(),
+          userId: req.user!.id.toString(),
+          productName: product.name
+        },
+      });
+      
+      res.json({ 
+        clientSecret: paymentIntent.client_secret,
+        product
+      });
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // Create a payment intent for role activation
+  app.post("/api/create-role-payment-intent", isAuthenticated, async (req, res) => {
+    try {
+      const { role, referralCode } = req.body;
+      
+      if (![UserRole.ACTIVE_USER, UserRole.AFFILIATOR].includes(role)) {
+        return res.status(400).json({ error: "Invalid role" });
+      }
+      
+      // Check if user already has the role or higher
+      if (
+        (role === UserRole.ACTIVE_USER && req.user!.role !== UserRole.USER) ||
+        (role === UserRole.AFFILIATOR && req.user!.role === UserRole.AFFILIATOR)
+      ) {
+        return res.status(400).json({ error: "User already has this role or higher" });
+      }
+      
+      // Get activation fee based on role
+      const amount = role === UserRole.ACTIVE_USER ? 50 : 150;
+      
+      // Create payment intent
+      const paymentIntent = await stripe.paymentIntents.create({
+        amount: amount * 100, // Convert to cents
+        currency: "usd",
+        metadata: {
+          role,
+          userId: req.user!.id.toString(),
+          referralCode: referralCode || ''
+        },
+      });
+      
+      res.json({ 
+        clientSecret: paymentIntent.client_secret,
+        amount,
+        role
+      });
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // Webhook to handle successful payments
+  app.post("/api/stripe-webhook", async (req, res) => {
+    const payload = req.body;
+    
+    try {
+      const event = stripe.webhooks.constructEvent(
+        payload,
+        req.headers["stripe-signature"] as string,
+        process.env.STRIPE_WEBHOOK_SECRET || ""
+      );
+      
+      if (event.type === "payment_intent.succeeded") {
+        const paymentIntent = event.data.object as any;
+        const metadata = paymentIntent.metadata;
+        
+        if (metadata.productId) {
+          // Product purchase
+          const userId = parseInt(metadata.userId);
+          const productId = parseInt(metadata.productId);
+          const product = await storage.getProduct(productId);
+          
+          if (product) {
+            // Create order
+            const order = await storage.createOrder({
+              userId,
+              productId,
+              amount: product.price,
+              status: "COMPLETED"
+            });
+            
+            console.log(`Created order: ${order.id} for user ${userId}`);
+          }
+        } else if (metadata.role) {
+          // Role activation
+          const userId = parseInt(metadata.userId);
+          const role = metadata.role;
+          const referralCode = metadata.referralCode;
+          
+          // Activate user role
+          const user = await storage.activateUserRole(userId, role, referralCode);
+          
+          console.log(`Activated role ${role} for user ${userId}`);
+        }
+      }
+      
+      res.sendStatus(200);
+    } catch (error: any) {
+      console.error('Webhook error:', error.message);
+      return res.status(400).send(`Webhook Error: ${error.message}`);
     }
   });
 
